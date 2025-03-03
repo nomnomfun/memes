@@ -1,5 +1,7 @@
 import Autocomplete from "../components/Autocomplete";
-import Navbar from "@/components/Navbar";
+
+//const baseUrl = 'https://nomnom-1u79.onrender.com/find';
+const baseUrl = 'http://localhost:3001/find';
 
 export default function Home() {
   const handleSelect = (word) => {
