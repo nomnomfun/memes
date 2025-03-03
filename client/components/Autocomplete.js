@@ -11,17 +11,21 @@ const roboto = Roboto({
 });
 
 const wordsArray = [
-  "azalea",
+  "azalea", "andrew",
   "bitcoin", "btc", "butt", "biden", "bryant",
   "coin",
-  "donald",
-  "head",
+  "donald", "dog",
+  "food",
+  "hat", "head", "hot dog",
   "iggy",
   "joe", "job",
   "kobe",
   "minaj", "money",
   "nicki",
-  "trump"
+  "sunglasses", "strawberry",
+  "trump", "tate",
+  "viper",
+  "wif"
 ];
 
 const fuse = new Fuse(wordsArray, {
@@ -87,33 +91,33 @@ export default function Autocomplete() {
   };
 
   return (
-    <div className="flex flex-col items-center mt-20">
-      {/* Search Input - Centered Horizontally with Icon */}
-      <div className="flex items-center w-xl mx-auto relative">
+    <div className="flex flex-col items-center mt-10 px-4 md:px-10">
+      {/* Search Input - Responsive Width & Padding */}
+      <div className="flex items-center w-full max-w-lg md:max-w-xl relative">
         <input
           type="text"
           value={query}
           onChange={handleChange}
           placeholder="Type to search"
-          className={`w-full p-3 text-5xl text-[#3a3a3a] placeholder-[#c0c0c0] focus:outline-none font-light ${roboto.className} border-l-2 border-[#9d91fe] rounded-none pl-6`}
+          className={`w-full p-2 md:p-3 text-xl md:text-2xl text-[#3a3a3a] placeholder-[#c0c0c0] focus:outline-none font-light ${roboto.className} border-l-2 border-[#9d91fe] rounded-none pl-4 md:pl-6`}
         />
 
-        {/* Magnifying Glass Icon Container */}
+        {/* Magnifying Glass Icon - Clickable */}
         <div
-          className="flex items-center justify-center w-12 h-12 ml-2 rounded-full bg-[#9d91fe] shrink-0 cursor-pointer transition-transform duration-150 active:scale-90"
+          className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 ml-2 rounded-full bg-[#9d91fe] shrink-0 cursor-pointer transition-transform duration-150 active:scale-90"
           onClick={handleSearch}
         >
           <Search size={24} color="white" />
         </div>
       </div>
 
-      {/* Suggested Words Container with additional margin */}
+      {/* Suggested Words Container - Wraps Flexibly */}
       {results.length > 0 && (
-        <div className="w-xl mt-8 mx-auto flex flex-wrap justify-start gap-2">
+        <div className="w-full max-w-lg md:max-w-xl mt-6 md:mt-8 flex flex-wrap justify-start gap-2">
           {results.map((word, index) => (
             <div
               key={index}
-              className={`px-3 py-1 border rounded-full cursor-pointer transition 
+              className={`px-3 py-1 text-sm md:text-base border rounded-full cursor-pointer transition 
                 ${chosenWords.includes(word)
                 ? "bg-[#9d91fe] border-[#9d91fe] text-[#fefeff] font-bold"
                 : "bg-white border-[#c0c0c0] text-[#3a3a3a] hover:bg-gray-600 hover:text-white"}
@@ -126,11 +130,16 @@ export default function Autocomplete() {
         </div>
       )}
 
-      {/* Display Images in a Grid */}
+      {/* Display Images in a Responsive Grid */}
       {images && images.length > 0 && (
-        <div className="w-xl mt-8 mx-auto grid grid-cols-3 gap-4">
+        <div className="w-full max-w-lg md:max-w-xl mt-6 grid grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((img, index) => (
-            <img key={index} src={img.secure_url} alt="" className="w-full h-auto rounded-lg" />
+            <img
+              key={index}
+              src={img.secure_url}
+              alt=""
+              className="w-full h-auto rounded-lg object-cover"
+            />
           ))}
         </div>
       )}
