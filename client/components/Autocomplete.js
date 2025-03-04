@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Search } from "lucide-react"; // Import the magnifying glass icon
 import Fuse from "fuse.js";
 import axios from "axios"; // Import axios for API requests
+import {ToastContainer, toast} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 import { Roboto } from "next/font/google";
 
 // Importing the Roboto font from next/font/google
@@ -77,12 +80,21 @@ export default function Autocomplete() {
   const handleSearch = async () => {
     if (chosenWords.length === 0) return; // Don't search if no tags are selected
 
+    const loadToast = toast.loading("Searching for images...", {
+      position: "bottom-center",
+      hideProgressBar: true,
+      draggable: false,
+      pauseOnHover: false,
+      pauseOnFocusLoss: false
+    });
+
     try {
       const response = await axios.post(baseUrl, {
         tags: chosenWords,
       });
 
       if (response.status === 200) {
+        toast.update(loadToast, { render: `Found ${response.data.length} ${response.data.length === 1 ? 'image' : 'images'}!`, type: "success", isLoading: false, autoClose: 2000 });
         setImages(response.data); // Update state with fetched images
       }
     } catch (error) {
@@ -143,6 +155,7 @@ export default function Autocomplete() {
           ))}
         </div>
       )}
+      <ToastContainer />
     </div>
   );
 }
