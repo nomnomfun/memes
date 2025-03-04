@@ -36,7 +36,8 @@ const fuse = new Fuse(wordsArray, {
   threshold: 0.4, // Adjusts match sensitivity
 });
 
-const baseUrl = "http://localhost:3001/find";
+// const baseUrl = "http://localhost:3001/find";
+const baseUrl = "https://memes-rgo0.onrender.com/find";
 
 export default function Autocomplete() {
   const [query, setQuery] = useState("");
@@ -98,6 +99,7 @@ export default function Autocomplete() {
         setImages(response.data); // Update state with fetched images
       }
     } catch (error) {
+      toast.update(loadToast, { render: `Error fetching images. Try again later!`, type: "error", isLoading: false, autoClose: 2000 });
       console.log("Error fetching images:", error.response?.data?.message || error.message);
     }
   };
