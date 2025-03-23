@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "lucide-react"; // Import the magnifying glass icon
 import Fuse from "fuse.js";
 import axios from "axios"; // Import axios for API requests
 import {ToastContainer, toast} from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 import { Roboto } from "next/font/google";
 
@@ -13,39 +13,56 @@ const roboto = Roboto({
   subsets: ["latin"], // Ensure proper character support
 });
 
-const wordsArray = [
-  "azalea", "andrew",
-  "bitcoin", "btc", "butt", "biden", "bryant",
-  "coin",
-  "donald", "dog",
-  "food",
-  "hat", "head", "hot dog",
-  "iggy",
-  "joe", "job",
-  "kobe",
-  "minaj", "money",
-  "nicki",
-  "sunglasses", "strawberry",
-  "trump", "tate",
-  "viper",
-  "wif"
-];
-
-const fuse = new Fuse(wordsArray, {
-  includeScore: true,
-  threshold: 0.4, // Adjusts match sensitivity
-});
-
-// const baseUrl = "http://localhost:3001/find";
-const baseUrl = "https://memes-rgo0.onrender.com/find";
+//const baseUrl = "http://localhost:3001";
+const baseUrl = "https://memes-rgo0.onrender.com";
 
 export default function Autocomplete() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState(wordsArray); // Initialize with all words
+  const [wordsArray, setWordsArray] = useState([]); // Store tags dynamically
+  const [results, setResults] = useState([]); // Initialize with empty array
   const [chosenWords, setChosenWords] = useState([]); // Stores selected words
   const [images, setImages] = useState([]); // Store fetched images
+  const [fuse, setFuse] = useState(null); // Store Fuse.js instance
+
+  // Fetch tags from backend on component mount
+  useEffect(() => {
+    const fetchTags = async () => {
+      const loadToast = toast.loading("Loading tags...", {
+        position: "bottom-center",
+        hideProgressBar: true,
+      });
+
+      try {
+        const response = await axios.get(`${baseUrl}/tags`);
+        if (response.status === 200 && Array.isArray(response.data)) {
+          setWordsArray(response.data);
+          setResults(response.data);
+          setFuse(new Fuse(response.data, { includeScore: true, threshold: 0.4 })); // Initialize Fuse.js with fetched words
+
+          toast.update(loadToast, {
+            render: "Tags loaded successfully!",
+            type: "success",
+            isLoading: false,
+            autoClose: 2000,
+          });
+        }
+      } catch (error) {
+        toast.update(loadToast, {
+          render: "Failed to load tags. Try again!",
+          type: "error",
+          isLoading: false,
+          autoClose: 2000,
+        });
+        console.error("Error fetching tags:", error.message);
+      }
+    };
+
+    fetchTags();
+  }, []);
 
   const updateResults = (input, updatedChosenWords) => {
+    if (!fuse) return; // Ensure fuse is initialized
+
     if (input.trim() === "") {
       setResults([...updatedChosenWords, ...wordsArray.filter(w => !updatedChosenWords.includes(w))]);
       return;
@@ -90,17 +107,25 @@ export default function Autocomplete() {
     });
 
     try {
-      const response = await axios.post(baseUrl, {
-        tags: chosenWords,
-      });
+      const response = await axios.post(`${baseUrl}/find`, { tags: chosenWords });
 
       if (response.status === 200) {
-        toast.update(loadToast, { render: `Found ${response.data.length} ${response.data.length === 1 ? 'image' : 'images'}!`, type: "success", isLoading: false, autoClose: 2000 });
-        setImages(response.data); // Update state with fetched images
+        toast.update(loadToast, {
+          render: `Found ${response.data.length} ${response.data.length === 1 ? "image" : "images"}!`,
+          type: "success",
+          isLoading: false,
+          autoClose: 2000
+        });
+        setImages(response.data);
       }
     } catch (error) {
-      toast.update(loadToast, { render: `Error fetching images. Try again later!`, type: "error", isLoading: false, autoClose: 2000 });
-      console.log("Error fetching images:", error.response?.data?.message || error.message);
+      toast.update(loadToast, {
+        render: "Error fetching images. Try again later!",
+        type: "error",
+        isLoading: false,
+        autoClose: 2000
+      });
+      console.error("Error fetching images:", error.message);
     }
   };
 
