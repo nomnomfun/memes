@@ -47,7 +47,7 @@ app.post("/find", async (req, res) => {
     const result = await cloudinary.search
       .expression(searchExpression)
       .sort_by("created_at", "desc") // Sort by latest images
-      .max_results(20) // Limit the number of results
+      .max_results(4000) // Limit the number of results
       .execute();
 
     // Send back the found images
